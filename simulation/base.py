@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from enum import Enum, auto
+from math import pow, sqrt
 from typing import ClassVar, Tuple, Set
 
 from __future__ import annotations
@@ -8,6 +9,7 @@ from __future__ import annotations
 
 class Warehouse:
     coalitions: Set[RobotCoalition]
+    robots: Set[Robot]
 
     def __init__(self, width=100, height=100):
         self.width = width
@@ -29,6 +31,8 @@ class Warehouse:
         # move robots being part of coalitions
         for c in self.coalitions:
             c.update_states()
+        for r in self.robots:
+            r.move(time_step)
         # TODO move robots outside of coallitions
 
 
@@ -43,6 +47,7 @@ class WarehouseObject:
 
 
 class Robot(WarehouseObject):
+    target: Tuple[float, float]
 
     class RobotState(Enum):
         IDLE = auto()
@@ -66,6 +71,40 @@ class Robot(WarehouseObject):
         self.state = self.RobotState.IDLE
         self.target = None  #Tuple[x,y]
 
+    def move(self, movement_duration) -> None:
+        """Moves robot in direction depending on current state and target.
+        Does nothing when there is no need to move
+        """
+        speed = None
+        if self.state is self.RobotState.DRIVING_EMPTY:
+            speed = self.EMPTY_SPEED
+        elif self.state is self.RobotState.DRIVING_LOADED:
+            speed = self.LOADED_SPEED
+        else:
+            return
+
+        covered_distance = movement_duration * speed
+        target_x, target_y = self.target
+        distance = self.get_distance_to(target_x, target_y)
+        if covered_distance > distance:
+            self._reach_target(target_x, target_y)
+        else:
+            percentage = covered_distance / distance
+            self.x = self.x + percentage * (self.x - target_x)
+            self.y = self.y + percentage * (self.y - target_y)
+
+    def _reach_target(self, target_x, target_y):
+        self.x = target_x
+        self.y = target_y
+        self.target = None
+        if self.state is self.RobotState.DRIVING_EMPTY:
+            self.state = self.RobotState.WAITING
+        if self.state is self.RobotState.DRIVING_LOADED:
+            self.state = self.RobotState.IDLE
+
+    def get_distance_to(self, x, y):
+        return sqrt((x - self.x)**2 + (y - self.y)**2)
+
 
 class Box(WarehouseObject):
 
@@ -81,6 +120,7 @@ class Box(WarehouseObject):
 
 
 class RobotCoalition:
+    robots: Set[Robot]
 
     class State(Enum):
         ASSEMBLING = auto()
@@ -91,12 +131,30 @@ class RobotCoalition:
                  target_location: Tuple[int, int]) -> None:
         self.robots = robots
         self.box = box
-        self.x_target, self.y_target = target_location
-        self.x = self.box.x
-        self.y = self.box.y
-        self.state = self.ASSEMBLING
+        self.target = target_location
+        self.state = self.State.ASSEMBLING
+        self._set_robots_target((box.x, box.y), Robot.RobotState.DRIVING_EMPTY)
 
     def update_states(self):
-        """Updates state of coallition (targets of robots)
+        """Updates state and targets of coallition
         """
-        raise NotImplementedError
+        if self.state is self.State.ASSEMBLING:
+            assembled = True
+            for r in self.robots:
+                if r.state is r.RobotState.DRIVING_EMPTY:
+                    assembled = False
+                    break
+            if assembled:
+                self.state = self.State.DELIVERING
+                self._set_robots_target(self.target,
+                                        Robot.RobotState.DRIVING_LOADED)
+        elif self.state is self.State.DELIVERING:
+            #checking only one robot
+            if self.robots[0].state is Robot.RobotState.IDLE:
+                self.state = self.State.DISASSEMBLED
+
+    def _set_robots_target(self, target: Tuple[float, float],
+                           robot_state: Robot.RobotState):
+        for r in self.robots:
+            r.state = robot_state
+            r.target = target
