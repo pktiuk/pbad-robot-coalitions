@@ -40,10 +40,9 @@ class WarehouseObject:
     """represents any object which can be located inside of the Warehouse
     """
 
-    def __init__(self, x, y, parent=None):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.parent = parent
 
 
 class Robot(WarehouseObject):
@@ -62,10 +61,9 @@ class Robot(WarehouseObject):
     def __init__(self,
                  x=None,
                  y=None,
-                 parent: Warehouse = None,
                  capacity: int = 100,
                  battery_level: int = None):
-        super().__init__(x, y, parent)
+        super().__init__(x, y)
         self.battery_level = battery_level
         self.capacity = capacity
         self.state = self.RobotState.IDLE
@@ -111,10 +109,9 @@ class Box(WarehouseObject):
     def __init__(self,
                  x=None,
                  y=None,
-                 parent: Warehouse = None,
                  mass: int = 100,
                  points_of_support: int = 1):
-        super().__init__(x, y, parent)
+        super().__init__(x, y)
         self.mass = mass
         self.points_of_support = points_of_support
 
