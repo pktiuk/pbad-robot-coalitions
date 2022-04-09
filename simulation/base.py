@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 
+from __future__ import annotations
+
 from enum import Enum, auto
-from math import pow, sqrt
-from typing import ClassVar, Tuple, Set
+from math import sqrt
+from random import randint, uniform
+from typing import Tuple, Set
 
 from __future__ import annotations
 
 
 class Warehouse:
-    coalitions: Set[RobotCoalition]
     robots: Set[Robot]
+    coalitions: Set[RobotCoalition]
+    boxes_left: Set[Box]
 
     def __init__(self, width=100, height=100):
         self.width = width
@@ -19,10 +23,20 @@ class Warehouse:
         self.coalitions = set()
 
     def generate_random_boxes(self, boxes_num):
-        raise NotImplementedError
+        self.boxes_left = set()
+        for num in range(boxes_num):
+            self.boxes_left.add(
+                Box(uniform(0, self.width), uniform(0, self.height),
+                    (uniform(0, self.width), uniform(0, self.height)),
+                    randint(0, 400), randint(1, 4)))
 
     def generate_random_robots(self, robots_num: int):
-        raise NotImplementedError
+        self.robots = set()
+        for num in range(robots_num):
+            self.robots.add(
+                Robot(uniform(0, self.width),
+                      uniform(0, self.height),
+                      battery_level=uniform(0, 100)))
 
     def visualize(self):
         raise NotImplementedError
@@ -39,10 +53,15 @@ class Warehouse:
 class WarehouseObject:
     """represents any object which can be located inside of the Warehouse
     """
+    x: float
+    y: float
 
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+    def get_distance_to(self, x, y):
+        return sqrt((x - self.x)**2 + (y - self.y)**2)
 
 
 class Robot(WarehouseObject):
@@ -57,6 +76,7 @@ class Robot(WarehouseObject):
 
     EMPTY_SPEED = 1
     LOADED_SPEED = 0.5
+    DISCHARGE_SPEED = 0.05
 
     def __init__(self,
                  x=None,
@@ -86,10 +106,12 @@ class Robot(WarehouseObject):
         distance = self.get_distance_to(target_x, target_y)
         if covered_distance > distance:
             self._reach_target(target_x, target_y)
+            self._update_battery(distance)
         else:
             percentage = covered_distance / distance
             self.x = self.x + percentage * (self.x - target_x)
             self.y = self.y + percentage * (self.y - target_y)
+            self._update_battery(covered_distance)
 
     def _reach_target(self, target_x, target_y):
         self.x = target_x
@@ -100,20 +122,22 @@ class Robot(WarehouseObject):
         if self.state is self.RobotState.DRIVING_LOADED:
             self.state = self.RobotState.IDLE
 
-    def get_distance_to(self, x, y):
-        return sqrt((x - self.x)**2 + (y - self.y)**2)
+    def _update_battery(self, covered_distance):
+        self.battery_level = self.battery_level - covered_distance * self.DISCHARGE_SPEED
 
 
 class Box(WarehouseObject):
 
     def __init__(self,
-                 x=None,
-                 y=None,
+                 x,
+                 y,
+                 target_location: Tuple[int, int],
                  mass: int = 100,
                  points_of_support: int = 1):
         super().__init__(x, y)
         self.mass = mass
         self.points_of_support = points_of_support
+        self.target_location = target_location
 
 
 class RobotCoalition:
@@ -124,11 +148,10 @@ class RobotCoalition:
         DELIVERING = auto()
         DISASSEMBLED = auto()
 
-    def __init__(self, robots: set, box: Box,
-                 target_location: Tuple[int, int]) -> None:
+    def __init__(self, robots: set, box: Box) -> None:
         self.robots = robots
         self.box = box
-        self.target = target_location
+        self.target = box.target_location
         self.state = self.State.ASSEMBLING
         self._set_robots_target((box.x, box.y), Robot.RobotState.DRIVING_EMPTY)
 
