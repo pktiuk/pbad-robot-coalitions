@@ -66,16 +66,20 @@ class WarehouseVisualizer:
     GREEN = (0, 200, 0)
     BLUE = (0, 0, 255)
 
-    BOX_SIZE = 10
-    ROBOT_SIZE = 4
+    PX_PER_M = 4  #Pixels per meter ratio
+
+    # Size in meters
+    BOX_SIZE = 2
+    ROBOT_SIZE = 1
 
     def __init__(self, warehouse: Warehouse, title: str = "Warehouse"):
-        self.x = warehouse.width
-        self.y = warehouse.height
         self.warehouse = warehouse
-        self.display = pygame.display.set_mode((self.x, self.y), )
+        self.display = pygame.display.set_mode(
+            (warehouse.width * self.PX_PER_M,
+             warehouse.height * self.PX_PER_M), )
         self.display.fill(self.LIGHT_GRAY)
-        pygame.display.set_caption(title)
+        pygame.display.set_caption(
+            f'{title} {warehouse.width}m x {warehouse.height}m')
         self.update()
 
     def update(self):
@@ -106,15 +110,20 @@ class WarehouseVisualizer:
     def _draw_square(self, x_center: float, y_center: float, color):
         pygame.draw.rect(
             self.display, color,
-            pygame.Rect(x_center - self.BOX_SIZE / 2,
-                        y_center - self.BOX_SIZE / 2, self.BOX_SIZE,
-                        self.BOX_SIZE))
+            pygame.Rect((x_center - self.BOX_SIZE / 2) * self.PX_PER_M,
+                        (y_center - self.BOX_SIZE / 2) * self.PX_PER_M,
+                        self.BOX_SIZE * self.PX_PER_M,
+                        self.BOX_SIZE * self.PX_PER_M))
 
     def _draw_circle(self, x, y, radius, color) -> None:
-        pygame.draw.circle(self.display, color, (x, y), radius)
+        pygame.draw.circle(self.display, color,
+                           (x * self.PX_PER_M, y * self.PX_PER_M),
+                           radius * self.PX_PER_M)
 
     def _draw_line(self, x1, y1, x2, y2, color) -> None:
-        pygame.draw.line(self.display, color, (x1, y1), (x2, y2))
+        pygame.draw.line(self.display, color,
+                         (x1 * self.PX_PER_M, y1 * self.PX_PER_M),
+                         (x2 * self.PX_PER_M, y2 * self.PX_PER_M))
 
 
 class WarehouseObject:
