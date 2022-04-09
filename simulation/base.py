@@ -60,10 +60,10 @@ class Warehouse:
 
 
 class WarehouseVisualizer:
-    LIGHT_GRAY = (224, 224, 224)
+    LIGHT_GRAY = (214, 214, 214)
     BLACK = (0, 0, 0)
-    RED = (255, 0, 0)
-    GREEN = (0, 200, 0)
+    ROBOT_COLOR = (255, 50, 0)
+    BOX_COLOR = (210, 190, 0)
     BLUE = (0, 0, 255)
 
     PX_PER_M = 4  #Pixels per meter ratio
@@ -94,16 +94,16 @@ class WarehouseVisualizer:
 
     def _draw_boxes(self):
         for box in self.warehouse.boxes_left:
-            self._draw_square(box.x, box.y, self.GREEN)
+            self._draw_square(box.x, box.y, self.BOX_COLOR)
             x2, y2 = box.target
-            self._draw_line(box.x, box.y, x2, y2, self.GREEN)
+            self._draw_line(box.x, box.y, x2, y2, self.BOX_COLOR)
 
     def _draw_robots(self):
         for r in self.warehouse.robots:
-            self._draw_circle(r.x, r.y, self.ROBOT_SIZE, self.RED)
+            self._draw_circle(r.x, r.y, self.ROBOT_SIZE, self.ROBOT_COLOR)
             if r.target is not None:
                 x2, y2 = r.target
-                self._draw_line(r.x, r.y, x2, y2, self.GREEN)
+                self._draw_line(r.x, r.y, x2, y2, self.BOX_COLOR)
 
         #TODO add robots numbers when multiple robots in the same place
 
@@ -197,6 +197,7 @@ class Robot(WarehouseObject):
             self.state = self.RobotState.WAITING
         if self.state is self.RobotState.DRIVING_LOADED:
             self.state = self.RobotState.IDLE
+        #TODO add going to charging place
 
     def _update_battery(self, covered_distance):
         self.battery_level = self.battery_level - covered_distance * self.DISCHARGE_SPEED
