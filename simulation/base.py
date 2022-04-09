@@ -16,12 +16,16 @@ class Warehouse:
     coalitions: Set[RobotCoalition]
     boxes_left: Set[Box]
 
-    def __init__(self, width=100, height=100):
+    def __init__(self, width=100, height=100, visualize: bool = False):
         self.width = width
         self.height = height
         self.robots = set()
         self.boxes_left = set()
         self.coalitions = set()
+        self.visualizer = None
+        if visualize:
+            self.visualizer = WarehouseVisualizer(self)
+            self.update_visualization()
 
     def generate_random_boxes(self, boxes_num):
         self.boxes_left = set()
@@ -30,6 +34,7 @@ class Warehouse:
                 Box(uniform(0, self.width), uniform(0, self.height),
                     (uniform(0, self.width), uniform(0, self.height)),
                     randint(0, 400), randint(1, 4)))
+        self.update_visualization()
 
     def generate_random_robots(self, robots_num: int):
         self.robots = set()
@@ -38,9 +43,11 @@ class Warehouse:
                 Robot(uniform(0, self.width),
                       uniform(0, self.height),
                       battery_level=uniform(0, 100)))
+        self.update_visualization()
 
-    def visualize(self):
-        raise NotImplementedError
+    def update_visualization(self):
+        if self.visualizer is not None:
+            self.visualizer.update()
 
     def step(self, time_step=0.1):
         # move robots being part of coalitions
@@ -49,6 +56,7 @@ class Warehouse:
         for r in self.robots:
             r.move(time_step)
         # TODO move robots outside of coallitions
+        self.update_visualization()
 
 
 class WarehouseVisualizer:
@@ -68,21 +76,17 @@ class WarehouseVisualizer:
         self.display = pygame.display.set_mode((self.x, self.y), )
         self.display.fill(self.LIGHT_GRAY)
         pygame.display.set_caption(title)
+        self.update()
 
-    def show(self):
+    def update(self):
         self.display.fill(self.LIGHT_GRAY)
         self._draw_boxes()
         self._draw_robots()
-
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-            pygame.display.update()
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE]:
-                break
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
     def _draw_boxes(self):
         for box in self.warehouse.boxes_left:
