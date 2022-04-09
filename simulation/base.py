@@ -55,7 +55,7 @@ class WarehouseVisualizer:
     LIGHT_GRAY = (224, 224, 224)
     BLACK = (0, 0, 0)
     RED = (255, 0, 0)
-    GREEN = (0, 255, 0)
+    GREEN = (0, 200, 0)
     BLUE = (0, 0, 255)
 
     BOX_SIZE = 10
@@ -65,10 +65,9 @@ class WarehouseVisualizer:
         self.x = warehouse.width
         self.y = warehouse.height
         self.warehouse = warehouse
-        self.display = pygame.display.set_mode((self.x, self.y),)
+        self.display = pygame.display.set_mode((self.x, self.y), )
         self.display.fill(self.LIGHT_GRAY)
         pygame.display.set_caption(title)
-
 
     def show(self):
         self.display.fill(self.LIGHT_GRAY)
@@ -88,22 +87,30 @@ class WarehouseVisualizer:
     def _draw_boxes(self):
         for box in self.warehouse.boxes_left:
             self._draw_square(box.x, box.y, self.GREEN)
-            #TODO draw line to target
+            x2, y2 = box.target
+            self._draw_line(box.x, box.y, x2, y2, self.GREEN)
 
     def _draw_robots(self):
         for r in self.warehouse.robots:
             self._draw_circle(r.x, r.y, self.ROBOT_SIZE, self.RED)
-            #TODO draw line to target
+            if r.target is not None:
+                x2, y2 = r.target
+                self._draw_line(r.x, r.y, x2, y2, self.GREEN)
+
         #TODO add robots numbers when multiple robots in the same place
 
     def _draw_square(self, x_center: float, y_center: float, color):
         pygame.draw.rect(
             self.display, color,
-            pygame.Rect(x_center - self.BOX_SIZE, y_center - self.BOX_SIZE,
-                        self.BOX_SIZE, self.BOX_SIZE))
+            pygame.Rect(x_center - self.BOX_SIZE / 2,
+                        y_center - self.BOX_SIZE / 2, self.BOX_SIZE,
+                        self.BOX_SIZE))
 
     def _draw_circle(self, x, y, radius, color) -> None:
         pygame.draw.circle(self.display, color, (x, y), radius)
+
+    def _draw_line(self, x1, y1, x2, y2, color) -> None:
+        pygame.draw.line(self.display, color, (x1, y1), (x2, y2))
 
 
 class WarehouseObject:
@@ -193,7 +200,7 @@ class Box(WarehouseObject):
         super().__init__(x, y)
         self.mass = mass
         self.points_of_support = points_of_support
-        self.target_location = target_location
+        self.target = target_location
 
 
 class RobotCoalition:
@@ -207,7 +214,7 @@ class RobotCoalition:
     def __init__(self, robots: set, box: Box) -> None:
         self.robots = robots
         self.box = box
-        self.target = box.target_location
+        self.target = box.target
         self.state = self.State.ASSEMBLING
         self._set_robots_target((box.x, box.y), Robot.RobotState.DRIVING_EMPTY)
 
