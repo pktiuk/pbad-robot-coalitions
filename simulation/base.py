@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import sys
 from enum import Enum, auto
 from math import sqrt
 from random import randint, uniform
 from typing import Tuple, Set
 
-from __future__ import annotations
+import pygame
 
 
 class Warehouse:
@@ -48,6 +49,61 @@ class Warehouse:
         for r in self.robots:
             r.move(time_step)
         # TODO move robots outside of coallitions
+
+
+class WarehouseVisualizer:
+    LIGHT_GRAY = (224, 224, 224)
+    BLACK = (0, 0, 0)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+
+    BOX_SIZE = 10
+    ROBOT_SIZE = 4
+
+    def __init__(self, warehouse: Warehouse, title: str = "Warehouse"):
+        self.x = warehouse.width
+        self.y = warehouse.height
+        self.warehouse = warehouse
+        self.display = pygame.display.set_mode((self.x, self.y),)
+        self.display.fill(self.LIGHT_GRAY)
+        pygame.display.set_caption(title)
+
+
+    def show(self):
+        self.display.fill(self.LIGHT_GRAY)
+        self._draw_boxes()
+        self._draw_robots()
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            pygame.display.update()
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                break
+
+    def _draw_boxes(self):
+        for box in self.warehouse.boxes_left:
+            self._draw_square(box.x, box.y, self.GREEN)
+            #TODO draw line to target
+
+    def _draw_robots(self):
+        for r in self.warehouse.robots:
+            self._draw_circle(r.x, r.y, self.ROBOT_SIZE, self.RED)
+            #TODO draw line to target
+        #TODO add robots numbers when multiple robots in the same place
+
+    def _draw_square(self, x_center: float, y_center: float, color):
+        pygame.draw.rect(
+            self.display, color,
+            pygame.Rect(x_center - self.BOX_SIZE, y_center - self.BOX_SIZE,
+                        self.BOX_SIZE, self.BOX_SIZE))
+
+    def _draw_circle(self, x, y, radius, color) -> None:
+        pygame.draw.circle(self.display, color, (x, y), radius)
 
 
 class WarehouseObject:
