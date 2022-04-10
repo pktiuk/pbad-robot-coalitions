@@ -16,5 +16,6 @@ while len(w1.boxes_done) == 0:
     w1.step(0.1)
     sleep(0.01)
 
+print(f'Finished in: {w1.passed_time}s')
 print("press Enter to exit")
 c = input()

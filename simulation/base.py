@@ -24,6 +24,7 @@ class Warehouse:
         self.boxes_left = set()
         self.boxes_done = set()
         self.coalitions = set()
+        self.passed_time = 0
         self.visualizer = None
         if visualize:
             self.visualizer = WarehouseVisualizer(self)
@@ -63,6 +64,7 @@ class Warehouse:
                 self.boxes_done.add(c.box)
         self.coalitions = self.coalitions - coalitions_finished
         self.update_visualization()
+        self.passed_time += time_step
 
     def is_done(self) -> bool:
         '''is simulation done'''
