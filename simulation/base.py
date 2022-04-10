@@ -176,6 +176,7 @@ class Robot(WarehouseObject):
         self.capacity = capacity
         self.state = self.RobotState.IDLE
         self.target = None  #Tuple[x,y]
+        self.passed_distance = 0
 
     def move(self, movement_duration) -> bool:
         """Moves robot in direction depending on current state and target.
@@ -196,11 +197,13 @@ class Robot(WarehouseObject):
         distance = self.get_distance_to(target_x, target_y)
         if covered_distance > distance:
             self._reach_target(target_x, target_y)
+            self.passed_distance += distance
             self._update_battery(distance)
         else:
             percentage = covered_distance / distance
             self.x = self.x - percentage * (self.x - target_x)
             self.y = self.y - percentage * (self.y - target_y)
+            self.passed_distance += covered_distance
             self._update_battery(covered_distance)
 
     def _reach_target(self, target_x, target_y):
