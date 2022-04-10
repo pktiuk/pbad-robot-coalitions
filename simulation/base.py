@@ -6,13 +6,13 @@ import sys
 from enum import Enum, auto
 from math import sqrt
 from random import randint, uniform
-from typing import Tuple, Set
+from typing import Tuple, Set, List
 
 import pygame
 
 
 class Warehouse:
-    robots: Set[Robot]
+    robots: List[Robot]
     coalitions: Set[RobotCoalition]
     boxes_left: Set[Box]
     boxes_done: Set[Box]
@@ -20,7 +20,7 @@ class Warehouse:
     def __init__(self, width=100, height=100, visualize: bool = False):
         self.width = width
         self.height = height
-        self.robots = set()
+        self.robots = list()
         self.boxes_left = set()
         self.boxes_done = set()
         self.coalitions = set()
@@ -40,7 +40,7 @@ class Warehouse:
         self.update_visualization()
 
     def generate_random_robots(self, robots_num: int):
-        self.robots = set()
+        self.robots = list()
         for num in range(robots_num):
             self.robots.add(
                 Robot(uniform(0, self.width),
@@ -250,7 +250,7 @@ class RobotCoalition:
         DISASSEMBLED = auto()
 
     def __init__(self, robots: set, box: Box) -> None:
-        self.robots = robots
+        self.robots = set(robots)
         self.box = box
         self.target = box.target
         self.state = self.State.ASSEMBLING
