@@ -15,12 +15,14 @@ class Warehouse:
     robots: Set[Robot]
     coalitions: Set[RobotCoalition]
     boxes_left: Set[Box]
+    boxes_done: Set[Box]
 
     def __init__(self, width=100, height=100, visualize: bool = False):
         self.width = width
         self.height = height
         self.robots = set()
         self.boxes_left = set()
+        self.boxes_done = set()
         self.coalitions = set()
         self.visualizer = None
         if visualize:
@@ -50,13 +52,21 @@ class Warehouse:
             self.visualizer.update()
 
     def step(self, time_step=0.1):
-        # move robots being part of coalitions
-        for c in self.coalitions:
-            c.update_states()
         for r in self.robots:
             r.move(time_step)
-        # TODO move robots outside of coallitions
+        coalitions_finished = set()
+        for c in self.coalitions:
+            c.update_states()
+            if c.state is RobotCoalition.State.DISASSEMBLED:
+                coalitions_finished.add(c)
+                self.boxes_left.remove(c.box)
+                self.boxes_done.add(c.box)
+        self.coalitions = self.coalitions - coalitions_finished
         self.update_visualization()
+
+    def is_done(self) -> bool:
+        '''is simulation done'''
+        return len(self.boxes_left) == 0
 
 
 class WarehouseVisualizer:
@@ -165,10 +175,12 @@ class Robot(WarehouseObject):
         self.state = self.RobotState.IDLE
         self.target = None  #Tuple[x,y]
 
-    def move(self, movement_duration) -> None:
+    def move(self, movement_duration) -> bool:
         """Moves robot in direction depending on current state and target.
         Does nothing when there is no need to move
         """
+        if self.target is None:
+            return
         speed = None
         if self.state is self.RobotState.DRIVING_EMPTY:
             speed = self.EMPTY_SPEED
@@ -185,8 +197,8 @@ class Robot(WarehouseObject):
             self._update_battery(distance)
         else:
             percentage = covered_distance / distance
-            self.x = self.x + percentage * (self.x - target_x)
-            self.y = self.y + percentage * (self.y - target_y)
+            self.x = self.x - percentage * (self.x - target_x)
+            self.y = self.y - percentage * (self.y - target_y)
             self._update_battery(covered_distance)
 
     def _reach_target(self, target_x, target_y):
@@ -247,8 +259,11 @@ class RobotCoalition:
                                         Robot.RobotState.DRIVING_LOADED)
         elif self.state is self.State.DELIVERING:
             #checking only one robot
-            if self.robots[0].state is Robot.RobotState.IDLE:
+            any_robot = list(self.robots)[0]
+            if any_robot.state is Robot.RobotState.IDLE:
                 self.state = self.State.DISASSEMBLED
+            self.box.x = any_robot.x
+            self.box.y = any_robot.y
 
     def _set_robots_target(self, target: Tuple[float, float],
                            robot_state: Robot.RobotState):
