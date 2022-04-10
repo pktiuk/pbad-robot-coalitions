@@ -148,6 +148,9 @@ class WarehouseObject:
         self.x = x
         self.y = y
 
+    def __repr__(self):
+        return str(self.__dict__)
+
     def get_distance_to(self, x, y):
         return sqrt((x - self.x)**2 + (y - self.y)**2)
 
