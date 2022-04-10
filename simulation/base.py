@@ -164,7 +164,8 @@ class Robot(WarehouseObject):
 
     EMPTY_SPEED = 1
     LOADED_SPEED = 0.5
-    DISCHARGE_SPEED = 0.05
+    DISCHARGE_SPEED_EMPTY = 0.05
+    DISCHARGE_SPEED_PER_KG = 0.001
 
     def __init__(self,
                  x=None,
@@ -177,6 +178,7 @@ class Robot(WarehouseObject):
         self.state = self.RobotState.IDLE
         self.target = None  #Tuple[x,y]
         self.passed_distance = 0
+        self.carried_mass = 0
 
     def move(self, movement_duration) -> bool:
         """Moves robot in direction depending on current state and target.
@@ -212,12 +214,13 @@ class Robot(WarehouseObject):
         self.target = None
         if self.state is self.RobotState.DRIVING_EMPTY:
             self.state = self.RobotState.WAITING
-        if self.state is self.RobotState.DRIVING_LOADED:
+        elif self.state is self.RobotState.DRIVING_LOADED:
             self.state = self.RobotState.IDLE
+        self.carried_mass = 0
         #TODO add going to charging place
 
     def _update_battery(self, covered_distance):
-        self.battery_level = self.battery_level - covered_distance * self.DISCHARGE_SPEED
+        self.battery_level -= covered_distance * self.DISCHARGE_SPEED_EMPTY - covered_distance * self.carried_mass * self.DISCHARGE_SPEED_PER_KG
         #TODO use proper equation
 
 
@@ -276,3 +279,5 @@ class RobotCoalition:
         for r in self.robots:
             r.state = robot_state
             r.target = target
+            if robot_state is Robot.RobotState.DRIVING_LOADED:
+                r.carried_mass = self.box.mass / len(self.robots)
