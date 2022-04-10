@@ -76,7 +76,7 @@ class WarehouseVisualizer:
     BOX_COLOR = (210, 190, 0)
     BLUE = (0, 0, 255)
 
-    PX_PER_M = 4  #Pixels per meter ratio
+    PX_PER_M = 6  #Pixels per meter ratio
 
     # Size in meters
     BOX_SIZE = 2
@@ -113,7 +113,7 @@ class WarehouseVisualizer:
             self._draw_circle(r.x, r.y, self.ROBOT_SIZE, self.ROBOT_COLOR)
             if r.target is not None:
                 x2, y2 = r.target
-                self._draw_line(r.x, r.y, x2, y2, self.BOX_COLOR)
+                self._draw_line(r.x, r.y, x2, y2, self.ROBOT_COLOR)
 
         #TODO add robots numbers when multiple robots in the same place
 
@@ -213,6 +213,7 @@ class Robot(WarehouseObject):
 
     def _update_battery(self, covered_distance):
         self.battery_level = self.battery_level - covered_distance * self.DISCHARGE_SPEED
+        #TODO use proper equation
 
 
 class Box(WarehouseObject):
