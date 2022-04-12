@@ -42,7 +42,7 @@ class Warehouse:
     def generate_random_robots(self, robots_num: int):
         self.robots = list()
         for num in range(robots_num):
-            self.robots.add(
+            self.robots.append(
                 Robot(uniform(0, self.width),
                       uniform(0, self.height),
                       battery_level=uniform(0, 100)))
@@ -224,7 +224,6 @@ class Robot(WarehouseObject):
 
     def _update_battery(self, covered_distance):
         self.battery_level -= covered_distance * self.DISCHARGE_SPEED_EMPTY - covered_distance * self.carried_mass * self.DISCHARGE_SPEED_PER_KG
-        #TODO use proper equation
 
 
 class Box(WarehouseObject):
