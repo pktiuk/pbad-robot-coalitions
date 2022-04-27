@@ -7,6 +7,7 @@ from enum import Enum, auto
 from math import sqrt
 from random import randint, uniform
 from typing import Tuple, Set, List
+import random
 
 import pygame
 
@@ -208,7 +209,8 @@ class Robot(WarehouseObject):
                  x=None,
                  y=None,
                  capacity: int = 100,
-                 battery_level: int = None):
+                 battery_level: int = None,
+                 critical_battery_level: int = 20):
         super().__init__(x, y)
         self.battery_level = battery_level
         self.capacity = capacity
@@ -216,6 +218,7 @@ class Robot(WarehouseObject):
         self.target = None  #Tuple[x,y]
         self.passed_distance = 0
         self.carried_mass = 0
+        self.critical_battery_level = critical_battery_level
 
     def __str__(self):
         printed_dict = self.__dict__
@@ -271,6 +274,7 @@ class Robot(WarehouseObject):
 
 
 class Box(WarehouseObject):
+    #profitability: int
 
     def __init__(self,
                  x,
@@ -282,6 +286,8 @@ class Box(WarehouseObject):
         self.mass = mass
         self.points_of_support = points_of_support
         self.target = target_location
+        self.profitability = random.randint(1, 10)
+        self.num_of_robot_needed = None
 
     def __str__(self):
         return f"Box {self.__dict__}"
