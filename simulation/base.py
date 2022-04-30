@@ -74,7 +74,8 @@ class Warehouse:
 class WarehouseVisualizer:
     LIGHT_GRAY = (214, 214, 214)
     BLACK = (0, 0, 0)
-    ROBOT_COLOR = (255, 50, 0)
+    ROBOT_COLOR_CHARGED = (255, 50, 0)
+    ROBOT_COLOR_DISCHARGED = (155, 30, 0)
     BOX_COLOR = (210, 190, 0)
     BLUE = (0, 0, 255)
 
@@ -112,10 +113,15 @@ class WarehouseVisualizer:
 
     def _draw_robots(self):
         for r in self.warehouse.robots:
-            self._draw_circle(r.x, r.y, self.ROBOT_SIZE, self.ROBOT_COLOR)
+            if r.is_battery_critical():
+                self._draw_circle(r.x, r.y, self.ROBOT_SIZE,
+                                  self.ROBOT_COLOR_DISCHARGED)
+            else:
+                self._draw_circle(r.x, r.y, self.ROBOT_SIZE,
+                                  self.ROBOT_COLOR_CHARGED)
             if r.target is not None:
                 x2, y2 = r.target
-                self._draw_line(r.x, r.y, x2, y2, self.ROBOT_COLOR)
+                self._draw_line(r.x, r.y, x2, y2, self.ROBOT_COLOR_CHARGED)
 
         #TODO add robots numbers when multiple robots in the same place
 
@@ -169,6 +175,7 @@ class Robot(WarehouseObject):
     LOADED_SPEED = 0.5
     DISCHARGE_SPEED_EMPTY = 0.05
     DISCHARGE_SPEED_PER_KG = 0.001
+    BATTERY_CRITICAL_LEVEL = 20
 
     def __init__(self,
                  x=None,
@@ -224,6 +231,9 @@ class Robot(WarehouseObject):
 
     def _update_battery(self, covered_distance):
         self.battery_level -= covered_distance * self.DISCHARGE_SPEED_EMPTY - covered_distance * self.carried_mass * self.DISCHARGE_SPEED_PER_KG
+
+    def is_battery_critical(self) -> bool:
+        return self.battery_level <= self.BATTERY_CRITICAL_LEVEL
 
 
 class Box(WarehouseObject):
