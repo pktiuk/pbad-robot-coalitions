@@ -217,6 +217,9 @@ class Robot(WarehouseObject):
         self.passed_distance = 0
         self.carried_mass = 0
 
+    def __str__(self):
+        return f"Robot {self.__dict__}"
+
     def move(self, movement_duration) -> bool:
         """Moves robot in direction depending on current state and target.
         Does nothing when there is no need to move
@@ -275,6 +278,9 @@ class Box(WarehouseObject):
         self.mass = mass
         self.points_of_support = points_of_support
         self.target = target_location
+
+    def __str__(self):
+        return f"Box {self.__dict__}"
 
 
 class RobotCoalition:
