@@ -121,6 +121,16 @@ class WarehouseVisualizer:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                x_px, y_px = event.pos
+                x_m = x_px / self.PX_PER_M
+                y_m = y_px / self.PX_PER_M
+                print(f"Clicked:({x_m},{y_m})")
+                nearest_objects = self.warehouse.get_objects_by_loc(
+                    x_m, y_m, max_radius=3)
+                for x in nearest_objects:
+                    dist, obj = x
+                    print(f"dist: {dist:.2} Obj: {obj}")
 
     def _draw_boxes(self):
         for box in self.warehouse.boxes_left:
