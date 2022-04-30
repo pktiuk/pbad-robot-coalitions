@@ -218,7 +218,11 @@ class Robot(WarehouseObject):
         self.carried_mass = 0
 
     def __str__(self):
-        return f"Robot {self.__dict__}"
+        printed_dict = self.__dict__
+        for k, v in printed_dict.items():
+            if type(v) is float:
+                printed_dict[k] = round(v, 3)
+        return f"Robot {printed_dict}"
 
     def move(self, movement_duration) -> bool:
         """Moves robot in direction depending on current state and target.
