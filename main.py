@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from time import sleep
-from simulation.base import Warehouse, RobotCoalition
+from simulation import Warehouse, RobotCoalition
 
 print(1)
 w1 = Warehouse(200, 100, True)
