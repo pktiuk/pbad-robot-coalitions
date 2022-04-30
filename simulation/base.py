@@ -70,6 +70,23 @@ class Warehouse:
         '''is simulation done'''
         return len(self.boxes_left) == 0
 
+    def get_objects_by_loc(self,
+                           x,
+                           y,
+                           max_radius=10
+                           ) -> List[Tuple[float, WarehouseObject]]:
+        '''gets objects in selected radius sorted from the nearest'''
+        result = []
+        objects = list(self.boxes_left) + self.robots
+        for box in objects:
+            dist = box.get_distance_to(x, y)
+            if dist <= max_radius:
+                result.append((round(dist, 2), box))
+
+        sorting_fun = lambda x: x[0]
+        result.sort(key=sorting_fun)
+        return result
+
 
 class WarehouseVisualizer:
     LIGHT_GRAY = (214, 214, 214)
