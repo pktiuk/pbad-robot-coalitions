@@ -219,6 +219,7 @@ class Robot(WarehouseObject):
         self.passed_distance = 0
         self.carried_mass = 0
         self.critical_battery_level = critical_battery_level
+<<<<<<< HEAD
 
     def __str__(self):
         printed_dict = self.__dict__
@@ -226,6 +227,8 @@ class Robot(WarehouseObject):
             if type(v) is float:
                 printed_dict[k] = round(v, 3)
         return f"Robot {printed_dict}"
+=======
+>>>>>>> 4f3e1e06b42b16a16d75f96ce334e8f8ed2fff52
 
     def move(self, movement_duration) -> bool:
         """Moves robot in direction depending on current state and target.
@@ -288,9 +291,12 @@ class Box(WarehouseObject):
         self.target = target_location
         self.profitability = random.randint(1, 10)
         self.num_of_robot_needed = None
+<<<<<<< HEAD
 
     def __str__(self):
         return f"Box {self.__dict__}"
+=======
+>>>>>>> 4f3e1e06b42b16a16d75f96ce334e8f8ed2fff52
 
 
 class RobotCoalition:
