@@ -4,33 +4,32 @@ from time import sleep
 
 from simulation import Warehouse, RobotCoalition
 
-from coalition.dutch_auction import DutchAuction
+from coalition.dutch_auction import DutchAuction, RobotTaskPair
 
 
 print(1)
-w1 = Warehouse(200, 100, True)
-w1.generate_random_boxes(10)
-w1.generate_random_robots(14)
+w1 = Warehouse(200, 100, visualize=True)
+w1.generate_random_boxes(50)
+w1.generate_random_robots(100)
 r1 = list(w1.robots)[0:2]
 box1 = list(w1.boxes_left)[0]
-#r2 = list(w1.robots)[3:5]
-#box2 = list(w1.boxes_left)[1]
 
-test_robot = list(w1.robots)[0]
-test_robot.battery_level = 0
-
-list(w1.robots)[0] = test_robot
-
-cost_weights = [0.3, 0.7]
+cost_weights = [0.2, 0.8]
 
 coalition = DutchAuction(w1.robots, w1.boxes_left, cost_weights=cost_weights)
 
-col, box = coalition.start_auction()
+tasks_pairs = coalition.start_auction()
 
-coal1 = {RobotCoalition(set(col), box)}
+for pair in tasks_pairs:
+    print(pair)
+
+pair_set = [RobotCoalition(set(pair.robot), pair.box) for pair in tasks_pairs]
+
+
+coal1 = set(pair_set)
 w1.coalitions = coal1
 
-while len(w1.boxes_done) == 0:
+while True:  # len(w1.boxes_done) == 0:
     w1.step(0.1)
     sleep(0.01)
 
