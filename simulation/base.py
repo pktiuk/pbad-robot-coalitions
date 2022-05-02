@@ -36,7 +36,7 @@ class Warehouse:
             self.boxes_left.add(
                 Box(uniform(0, self.width), uniform(0, self.height),
                     (uniform(0, self.width), uniform(0, self.height)),
-                    randint(0, 400), randint(1, 4)))
+                    randint(0, 400), randint(1, 4),randint(1,10)))
         self.update_visualization()
 
     def generate_random_robots(self, robots_num: int):
@@ -277,11 +277,13 @@ class Box(WarehouseObject):
                  y,
                  target_location: Tuple[int, int],
                  mass: int = 100,
-                 points_of_support: int = 1):
+                 points_of_support: int = 1,
+                 utility: int=1):
         super().__init__(x, y)
         self.mass = mass
         self.points_of_support = points_of_support
         self.target = target_location
+        self.utility = utility
 
     def __str__(self):
         return f"Box {self.__dict__}"
