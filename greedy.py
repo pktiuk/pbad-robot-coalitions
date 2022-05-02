@@ -6,8 +6,20 @@ import numpy as np
 from time import sleep
 
 w1 = Warehouse(200, 100, True)
-w1.generate_random_boxes(100)
-w1.generate_random_robots(175)
+w1.generate_random_boxes(150)
+w1.generate_random_robots(300)
+
+chargedRobots=[]
+r = list(w1.robots)[0:len(w1.robots)]
+box = list(w1.boxes_left)[0:len(w1.boxes_left)]
+while len(chargedRobots) < len(w1.robots):
+    chargedRobots=[]
+    for i in range(0,len(w1.robots)):
+        if r[i].battery_level>=20:
+            chargedRobots.append(r[i])
+        else:
+            r[i].battery_level += 20
+
 globaltasks=0
 step=0
 while len(w1.boxes_left)>0:
@@ -15,13 +27,11 @@ while len(w1.boxes_left)>0:
     chargedRobots=[]
     r = list(w1.robots)[0:len(w1.robots)]
     box = list(w1.boxes_left)[0:len(w1.boxes_left)]
-    while len(chargedRobots) < len(w1.robots):
-        chargedRobots=[]
-        for i in range(0,len(w1.robots)):
-            if r[i].battery_level>=20:
-                chargedRobots.append(r[i])
-            else:
-                r[i].battery_level += 20
+    for i in range(0,len(w1.robots)):
+        if r[i].battery_level>=20:
+            chargedRobots.append(r[i])
+        else:
+            r[i].battery_level += 20
     leader=np.empty((len(w1.boxes_left),2))
     potentialCoalition=np.zeros((len(w1.boxes_left),3))
     potential=[]
