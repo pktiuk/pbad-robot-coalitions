@@ -7,7 +7,6 @@ from simulation import Warehouse, RobotCoalition
 from coalition.dutch_auction import DutchAuction, RobotTaskPair
 
 
-print(1)
 w1 = Warehouse(200, 100, visualize=True)
 w1.generate_random_boxes(50)
 w1.generate_random_robots(100)

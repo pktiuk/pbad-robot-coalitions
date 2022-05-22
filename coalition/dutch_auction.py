@@ -7,6 +7,7 @@ from typing import Set, List
 
 
 class RobotTaskPair():
+
     def __init__(self, robot_cost: List[RobotCost], box: Box):
         self.robot_cost = robot_cost
         self.robot = [r.robot for r in self.robot_cost]
@@ -17,13 +18,20 @@ class RobotTaskPair():
         text = f"Coalition id: {self.id}\n"
         summary_coalition_cost_energy = 0
         summary_coalition_cost_value = 0
+        worst_time = 0
         for r in self.robot_cost:
             text = text + f'Energy cost: {r.robot_energy_cost}, Cost: {r.cost}\n'
             summary_coalition_cost_energy = summary_coalition_cost_energy + r.robot_energy_cost
             summary_coalition_cost_value = summary_coalition_cost_value + r.cost
+            try:
+                if worst_time < r.task_time:
+                    worst_time = r.task_time
+            except:
+                pass
         
         text = text + f'Summary energy cost: {summary_coalition_cost_energy}, Cummary cost: {summary_coalition_cost_value}\n'
         text = text + f'Box profitability: {self.box.profitability}\n'
+        text = text + f'Task time: {worst_time}\n'
 
         return text
 
@@ -37,6 +45,9 @@ class RobotCost():
     COF_ENE = 0.05
     COF_LOADED = 0.001
 
+    EMPTY_SPEED = 1
+    LOADED_SPEED = 0.5
+
     ''' 
     Weighted cost of a robot; 
     
@@ -49,6 +60,7 @@ class RobotCost():
         self.robot_weighted_cost = float
         self.robot_energy_cost = float
         self.robot_available = True
+        self.task_time = float
 
     def update_cost(self) -> None:
         pass
@@ -60,6 +72,11 @@ class RobotCost():
         self.robot_energy_cost = self.robot.get_distance_to(box.x, box.y)*self.COF_ENE + \
             box.get_distance_to(x_target, y_target) * \
             (self.COF_ENE+box.points_of_support*self.COF_LOADED)
+
+    def time_cost(self, box: Box)->None:
+        x_target, y_target = box.target
+        self.task_time = (self.robot.get_distance_to(box.x, box.y)*self.EMPTY_SPEED + \
+            box.get_distance_to(x_target, y_target) *self.LOADED_SPEED)
 
     def weighted_robot_cost(self, weight: List[float, float]) -> None:
         self.robot_weighted_cost = self.cost * \
@@ -115,6 +132,7 @@ class DutchAuction:
 
                 for robot in self.robots_costs:
                     robot.energy_cost(box_task)
+                    robot.time_cost(box_task)
 
                 # while True:
                 ''' Create precoalition and check if precoalition is suitable for the box/task'''
@@ -193,7 +211,7 @@ class DutchAuction:
 
             if box.profitability >= pre_coalition_cost:
                 # TODO: Add robots removing
-                print(pre_coalition)
+                # print(pre_coalition)
                 return pre_coalition
 
             return None
