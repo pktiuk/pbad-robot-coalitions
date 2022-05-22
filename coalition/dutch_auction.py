@@ -12,7 +12,7 @@ class RobotTaskPair():
         self.robot_cost = robot_cost
         self.robot = [r.robot for r in self.robot_cost]
         self.box = box
-        self.id = 2#int
+        self.id = 2  # int
 
     def __str__(self):
         text = f"Coalition id: {self.id}\n"
@@ -20,7 +20,8 @@ class RobotTaskPair():
         summary_coalition_cost_value = 0
         worst_time = 0
         for r in self.robot_cost:
-            text = text + f'Energy cost: {r.robot_energy_cost}, Cost: {r.cost}\n'
+            text = text + \
+                f'Energy cost: {r.robot_energy_cost}, Cost: {r.cost}\n'
             summary_coalition_cost_energy = summary_coalition_cost_energy + r.robot_energy_cost
             summary_coalition_cost_value = summary_coalition_cost_value + r.cost
             try:
@@ -28,12 +29,14 @@ class RobotTaskPair():
                     worst_time = r.task_time
             except:
                 pass
-        
-        text = text + f'Summary energy cost: {summary_coalition_cost_energy}, Cummary cost: {summary_coalition_cost_value}\n'
+
+        text = text + \
+            f'Summary energy cost: {summary_coalition_cost_energy}, Cummary cost: {summary_coalition_cost_value}\n'
         text = text + f'Box profitability: {self.box.profitability}\n'
         text = text + f'Task time: {worst_time}\n'
 
         return text
+
 
 class RobotCost():
 
@@ -73,10 +76,10 @@ class RobotCost():
             box.get_distance_to(x_target, y_target) * \
             (self.COF_ENE+box.points_of_support*self.COF_LOADED)
 
-    def time_cost(self, box: Box)->None:
+    def time_cost(self, box: Box) -> None:
         x_target, y_target = box.target
-        self.task_time = (self.robot.get_distance_to(box.x, box.y)*self.EMPTY_SPEED + \
-            box.get_distance_to(x_target, y_target) *self.LOADED_SPEED)
+        self.task_time = (self.robot.get_distance_to(box.x, box.y)*self.EMPTY_SPEED +
+                          box.get_distance_to(x_target, y_target) * self.LOADED_SPEED)
 
     def weighted_robot_cost(self, weight: List[float, float]) -> None:
         self.robot_weighted_cost = self.cost * \
@@ -87,7 +90,7 @@ class DutchAuction:
     robots: List[Robot]
     profitability_box_list: List[Box]
 
-    robots_costs= []
+    robots_costs = []
 
     task_pairs = []
 
@@ -146,12 +149,12 @@ class DutchAuction:
                         self.robots_costs.remove(robot)
 
                     self.profitability_box_list.remove(box_task)
-                    
-                    self.task_pairs.append(RobotTaskPair(pre_coalition, box_task))
 
-                    if len(self.robots_costs)<= 4:
+                    self.task_pairs.append(
+                        RobotTaskPair(pre_coalition, box_task))
+
+                    if len(self.robots_costs) <= 4 or len(self.profitability_box_list) == 0:
                         return self.task_pairs
-
 
     def _discar_flat_robots(self) -> None:
         for robot in self.robots:
