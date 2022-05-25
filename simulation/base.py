@@ -33,10 +33,10 @@ class Warehouse:
 
     def generate_random_boxes(self, boxes_num):
         self.boxes_left = set()
-        i=0
+        # i=0
         for num in range(boxes_num):
-            random.seed(10+i)
-            i=i+1
+            # random.seed(10+i)
+            # i=i+1
             self.boxes_left.add(
                 Box(uniform(0, self.width), uniform(0, self.height),
                     (uniform(0, self.width), uniform(0, self.height)),
@@ -45,10 +45,10 @@ class Warehouse:
 
     def generate_random_robots(self, robots_num: int):
         self.robots = list()
-        i=0
+        # i=0
         for num in range(robots_num):
-            random.seed(10+i)
-            i=i+1
+            # random.seed(10+i)
+            # i=i+1
             self.robots.append(
                 Robot(uniform(0, self.width),
                       uniform(0, self.height),

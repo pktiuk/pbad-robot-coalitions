@@ -7,23 +7,32 @@ from typing import Set, List
 
 
 class RobotTaskPair():
+    summary_coalition_cost_energy = 0
+    summary_coalition_cost_value = 0
+
+
 
     def __init__(self, robot_cost: List[RobotCost], box: Box):
         self.robot_cost = robot_cost
         self.robot = [r.robot for r in self.robot_cost]
         self.box = box
         self.id = 2  # int
+        self.sum_cost = 0
+        
+        for r in self.robot_cost:
+            self.sum_cost = self.sum_cost + \
+                r.robot_energy_cost
 
     def __str__(self):
         text = f"Coalition id: {self.id}\n"
-        summary_coalition_cost_energy = 0
-        summary_coalition_cost_value = 0
+
         worst_time = 0
         for r in self.robot_cost:
             text = text + \
                 f'Energy cost: {r.robot_energy_cost}, Cost: {r.cost}\n'
-            summary_coalition_cost_energy = summary_coalition_cost_energy + r.robot_energy_cost
-            summary_coalition_cost_value = summary_coalition_cost_value + r.cost
+            self.summary_coalition_cost_energy = self.summary_coalition_cost_energy + \
+                r.robot_energy_cost
+            self.summary_coalition_cost_value = self.summary_coalition_cost_value + r.cost
             try:
                 if worst_time < r.task_time:
                     worst_time = r.task_time
@@ -31,12 +40,19 @@ class RobotTaskPair():
                 pass
 
         text = text + \
-            f'Summary energy cost: {summary_coalition_cost_energy}, Cummary cost: {summary_coalition_cost_value}\n'
+            f'Summary energy cost: {self.summary_coalition_cost_energy}, Cummary cost: {self.summary_coalition_cost_value}\n'
         text = text + f'Box profitability: {self.box.profitability}\n'
         text = text + f'Task time: {worst_time}\n'
 
         return text
 
+    def calculate_energy(self):
+        temp = 0
+        for r in self.robot_cost:
+            temp = temp + \
+                r.robot_energy_cost
+        
+        return temp
 
 class RobotCost():
 
