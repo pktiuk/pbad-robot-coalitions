@@ -1,5 +1,25 @@
 #!/usr/bin/env python3
 
+# from time import sleep
+# from simulation import Warehouse, RobotCoalition
+
+# print(1)
+# w1 = Warehouse(200, 100, True)
+# w1.generate_random_boxes(10)
+# w1.generate_random_robots(14)
+# r = list(w1.robots)[0:2]
+# box = list(w1.boxes_left)[0]
+# coal = {RobotCoalition(set(r), box)}
+# w1.coalitions = coal
+
+# while len(w1.boxes_done) == 0:
+#     w1.step(0.1)
+#     sleep(0.01)
+
+# print(f'Finished in: {w1.passed_time}s')
+# print("press Enter to exit")
+# c = input()
+
 from time import sleep
 
 from simulation import Warehouse, RobotCoalition
@@ -11,9 +31,9 @@ import matplotlib.pyplot as plt
 
 data = []
 
-for iteration in range(4):
-    w1 = Warehouse(200, 100, visualize=True)
-    w1.generate_random_boxes(10)
+for iteration in range(100):
+    w1 = Warehouse(200, 100, visualize=False)
+    w1.generate_random_boxes(30)
     w1.generate_random_robots(20)
     r1 = list(w1.robots)[0:2]
     box1 = list(w1.boxes_left)[0]
@@ -27,10 +47,11 @@ for iteration in range(4):
 
     energy_sum = 0
 
-    while len(w1.boxes_left) > 0:
-        coalition = DutchAuction(w1.robots, w1.boxes_left,
+    coalition = DutchAuction(w1.robots, w1.boxes_left,
                                  cost_weights=cost_weights)
 
+    while len(w1.boxes_left) > 0:
+        
         coalition.task_pairs = []
 
         tasks_pairs = coalition.start_auction()
@@ -39,8 +60,11 @@ for iteration in range(4):
             f"############# ZADANIE NUMER: {counter}########################")
         counter = counter + 1
 
+        if tasks_pairs is None:
+            break
+
         for pair in tasks_pairs:
-            print(pair)
+            # print(pair)
             energy_sum = energy_sum + pair.sum_cost
 
         pair_set = [RobotCoalition(set(pair.robot), pair.box)
@@ -52,7 +76,7 @@ for iteration in range(4):
         w1.coalitions = coal1
 
         while len(w1.boxes_done) < temp_pairs_sum:
-            w1.step(6)
+            w1.step(8)
             sleep(0.01)
 
     # print(f"FINAL ENERGY: {energy_sum}")

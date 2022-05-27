@@ -10,15 +10,13 @@ class RobotTaskPair():
     summary_coalition_cost_energy = 0
     summary_coalition_cost_value = 0
 
-
-
     def __init__(self, robot_cost: List[RobotCost], box: Box):
         self.robot_cost = robot_cost
         self.robot = [r.robot for r in self.robot_cost]
         self.box = box
         self.id = 2  # int
         self.sum_cost = 0
-        
+
         for r in self.robot_cost:
             self.sum_cost = self.sum_cost + \
                 r.robot_energy_cost
@@ -51,8 +49,9 @@ class RobotTaskPair():
         for r in self.robot_cost:
             temp = temp + \
                 r.robot_energy_cost
-        
+
         return temp
+
 
 class RobotCost():
 
@@ -110,6 +109,8 @@ class DutchAuction:
 
     task_pairs = []
 
+    robot_recharged = []
+
     '''epsilon - auction's constant
     '''
 
@@ -135,7 +136,8 @@ class DutchAuction:
 
         while True:
             # Updating Robot Cost per Service
-            self._cost_decrement()
+            if self._cost_decrement():
+                break
 
             # Perform Bidding
             for box_task in self.profitability_box_list:
@@ -172,10 +174,23 @@ class DutchAuction:
                     if len(self.robots_costs) <= 4 or len(self.profitability_box_list) == 0:
                         return self.task_pairs
 
+
     def _discar_flat_robots(self) -> None:
+        for robot in self.robot_recharged:
+            self.robots.append(robot)
+        
+        # if len(self.robots) != 20:
+        #     print("aa")
+
+        self.robot_recharged = []
+
         for robot in self.robots:
             if robot.battery_level <= robot.critical_battery_level:
+                robot.battery_level = 100
+                self.robot_recharged.append(robot)
                 self.robots.remove(robot)
+        
+        
 
     def _calculate_robot_needed(self) -> None:
         """ Calculate how many robots are needed to complete given task (push particular box to the desired destination) """
@@ -205,16 +220,24 @@ class DutchAuction:
 
         index_number = 0
         while True:
-            if self.robots_costs[index_number].robot_available is True:
-                break
+            if index_number<len(self.robots_costs)-1:
+                if self.robots_costs[index_number].robot_available is True:
+                    break
+                else:
+                    index_number = index_number+1
             else:
-                index_number = index_number+1
+                index_number=0
+                for robot in self.robots_costs:
+                    robot.cost = 11 # hardcoded
+                return True
 
         # Price decrement
         self.robots_costs[index_number].cost = self.robots_costs[index_number].cost-self.epsilon
 
         if self.robots_costs[index_number].cost == 0:
             self.robots_costs[index_number].robot_available = False
+
+        return False
 
     def _create_pre_coalition(self, box: Box) -> List:
         if len(self.robots) > box.points_of_support:
