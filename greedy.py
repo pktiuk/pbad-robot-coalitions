@@ -123,7 +123,6 @@ for step in range(1000): #1000
                 tasks += 1
         globaltasks += tasks
         maxTime=max(robotsTime)
-        maxTime+= 0.1*maxTime
         
         w1.coalitions = finalCoalition
         print(f'tasks done: {globaltasks}')
@@ -133,7 +132,6 @@ for step in range(1000): #1000
 
         print(f'Finished in: {w1.passed_time}s')
         print("press Enter to exit")
-        totalEnergy += 0.1*totalEnergy
 
     else:
         print(f"Calkowita energia: {totalEnergy}")
