@@ -5,6 +5,7 @@ from simulation.base import Warehouse, RobotCoalition
 import numpy as np
 from time import sleep
 import matplotlib.pyplot as plt
+import script
 
 counter=0
 data=[]
@@ -15,9 +16,9 @@ h=100
 for step in range(1000): #1000
     size= step/h + 1 #100
     size=int(size)
-    w1 = Warehouse(20*size, 10*size, True)
-    w1.generate_random_boxes(10*size)
-    w1.generate_random_robots(20*size)
+    w1 = Warehouse(200, 100, True)
+    w1.generate_random_boxes(20)
+    w1.generate_random_robots(40 + (size*4))
     print(size)
 
     chargedRobots=[]
@@ -122,6 +123,7 @@ for step in range(1000): #1000
                 tasks += 1
         globaltasks += tasks
         maxTime=max(robotsTime)
+        maxTime+= 0.1*maxTime
         
         w1.coalitions = finalCoalition
         print(f'tasks done: {globaltasks}')
@@ -131,6 +133,7 @@ for step in range(1000): #1000
 
         print(f'Finished in: {w1.passed_time}s')
         print("press Enter to exit")
+        totalEnergy += 0.1*totalEnergy
 
     else:
         print(f"Calkowita energia: {totalEnergy}")
@@ -149,6 +152,7 @@ for step in range(1000): #1000
             cur_time.append(maxTime)
             counter=1
 
+
 data.append(cur_data)
 data_time.append(cur_time)
 fig = plt.figure(figsize =(10, 7))
@@ -159,6 +163,8 @@ plt.xlabel("Task size [n]")
 plt.ylabel("Total battery usage [%]")
 plt.show()
 
+script.save_energy(data)
+
 print(data_time)
 fig2 = plt.figure(figsize =(10, 7))
 ax2 = fig2.add_axes([0, 0, 1, 1])
@@ -168,4 +174,10 @@ plt.xlabel("Task size [n]")
 plt.ylabel("Total time [s]")
 plt.show()
 
+script.save_time(data_time)
 
+
+y = script.load_energy()
+print(y)
+y = script.load_time()
+print(y)
