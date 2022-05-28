@@ -11,13 +11,13 @@ data=[]
 data_time=[]
 cur_data=[]
 cur_time=[]
-h=10
-for step in range(50):
-    size= step/h + 1
+h=100
+for step in range(1000): #1000
+    size= step/h + 1 #100
     size=int(size)
-    w1 = Warehouse(200, 100, True)
-    w1.generate_random_boxes(20*size)
-    w1.generate_random_robots(40 *size)
+    w1 = Warehouse(20*size, 10*size, True)
+    w1.generate_random_boxes(10*size)
+    w1.generate_random_robots(20*size)
     print(size)
 
     chargedRobots=[]
@@ -99,6 +99,7 @@ for step in range(50):
                 if gain != 0:
                     z += 1
         finalCoalition = set()
+        robotsTime=[]
         for j in range(0,len(w1.boxes_left)):
             coalition=[]
             coalition.append(leader[j][1])
@@ -115,15 +116,17 @@ for step in range(50):
                 energyUsed=0
                 for k in range(len(r1)):
                     energyUsed += box1.get_distance_to(r1[k].x,r1[k].y)*0.05+box1.get_distance_to(box1.target[0],box1.target[1])*0.001*box1.mass/box1.points_of_support
+                    robotsTime.append(box1.get_distance_to(r1[k].x,r1[k].y)+box1.get_distance_to(box1.target[0],box1.target[1])*2)
                 totalEnergy += energyUsed
                 finalCoalition.add(RobotCoalition(set(r1), box1))
                 tasks += 1
         globaltasks += tasks
+        maxTime=max(robotsTime)
         
         w1.coalitions = finalCoalition
         print(f'tasks done: {globaltasks}')
         while len(w1.boxes_done) != globaltasks:
-            w1.step(10)
+            w1.step(1000)
             sleep(0.00001)
 
         print(f'Finished in: {w1.passed_time}s')
@@ -134,7 +137,7 @@ for step in range(50):
         print('koniec')
         if counter!=h:
             cur_data.append(totalEnergy)
-            cur_time.append(w1.passed_time)
+            cur_time.append(maxTime)
             counter += 1
             print(len(cur_data))
         else:
@@ -143,7 +146,7 @@ for step in range(50):
             cur_data=[]
             cur_time=[]
             cur_data.append(totalEnergy)
-            cur_time.append(w1.passed_time)
+            cur_time.append(maxTime)
             counter=1
 
 data.append(cur_data)
@@ -151,12 +154,18 @@ data_time.append(cur_time)
 fig = plt.figure(figsize =(10, 7))
 ax = fig.add_axes([0, 0, 1, 1])
 bp = ax.boxplot(data)
+plt.title("Energy consumption graph")
+plt.xlabel("Task size [n]")
+plt.ylabel("Total battery usage [%]")
 plt.show()
 
 print(data_time)
 fig2 = plt.figure(figsize =(10, 7))
 ax2 = fig2.add_axes([0, 0, 1, 1])
 bp2 = ax2.boxplot(data_time)
+plt.title("Task exectuion time graph")
+plt.xlabel("Task size [n]")
+plt.ylabel("Total time [s]")
 plt.show()
 
 
