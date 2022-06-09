@@ -11,5 +11,5 @@ pip3 install -r requirements.txt
 Run simple example
 
 ```bash
-./main.py
+./simulatro_example.py
 ```
