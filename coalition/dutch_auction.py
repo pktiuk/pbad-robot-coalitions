@@ -141,15 +141,7 @@ class DutchAuction:
 
             # Perform Bidding
             for box_task in self.profitability_box_list:
-
-                ''' Calculate how many robots are needed to move the box '''
-                # self.calculate_robot_needed()
-
-                # while(True):
                 ''' Lower the cost of the most expensive robot '''
-                # self._change_robot_cost()
-                # for robot in self.robots_costs:
-                #    robot.weighted_robot_cost(self.cost_weights)
 
                 for robot in self.robots_costs:
                     robot.energy_cost(box_task)
@@ -198,8 +190,6 @@ class DutchAuction:
             box.num_of_robot_needed = int(box.mass/self.robots_capacity) + \
                 1 if box.mass % self.robots_capacity != 0 else 0
 
-    # def _calculate_robot_cost(self):
-    #    self.robots_costs = [robot.]
 
     def _change_robot_cost(self, weights) -> None:
         for robot in self.robots_costs:
@@ -253,7 +243,6 @@ class DutchAuction:
 
             if box.profitability >= pre_coalition_cost:
                 # TODO: Add robots removing
-                # print(pre_coalition)
                 return pre_coalition
 
             return None
