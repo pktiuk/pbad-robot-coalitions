@@ -13,3 +13,7 @@ Run simple example
 ```bash
 ./main.py
 ```
+
+## Run modified dutch algorithm
+
+Run `results.ipynb` notebook file.
