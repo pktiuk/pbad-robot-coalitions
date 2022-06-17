@@ -14,6 +14,14 @@ Run simple example
 ./simulatro_example.py
 ```
 
+## Run greedy algorithm
+
+To run greedy algorithm solution go to
+```bash
+./greedy.ipynb
+```
+and execute cell
+
 ## Run modified dutch algorithm
 
 Run `results.ipynb` notebook file.
