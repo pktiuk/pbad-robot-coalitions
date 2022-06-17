@@ -12,13 +12,13 @@ data=[]
 data_time=[]
 cur_data=[]
 cur_time=[]
-h=100
-for step in range(1000): #1000
+h=50
+for step in range(500): #1000
     size= step/h + 1 #100
     size=int(size)
     w1 = Warehouse(200, 100, True)
-    w1.generate_random_boxes(20)
-    w1.generate_random_robots(40 + (size*4))
+    w1.generate_random_boxes(10*size)
+    w1.generate_random_robots(20*size)
     print(size)
 
     chargedRobots=[]
